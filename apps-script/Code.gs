@@ -93,11 +93,11 @@ function markProcessed(id) {
   if (!id) return;
   const sh = getSheet();
   const rows = sh.getDataRange().getValues();
+  // Marca TODAS las filas con ese id (por si hay duplicados), no solo la primera.
   for (let i = 1; i < rows.length; i++) {
     if (String(rows[i][0]) === String(id)) {
       sh.getRange(i + 1, 11).setValue(true);
       sh.getRange(i + 1, 12).setValue(new Date());
-      break;
     }
   }
 }
