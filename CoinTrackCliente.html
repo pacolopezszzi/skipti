@@ -172,10 +172,15 @@ const CFG_KEY='cointk_cfg';
 const COIN_D=[{d:'0.50',lbl:'$0.50'},{d:'1',lbl:'$1'},{d:'2',lbl:'$2'},{d:'5',lbl:'$5'},{d:'10',lbl:'$10'}];
 const BILL_D=[{d:'20',lbl:'$20'},{d:'50',lbl:'$50'},{d:'100',lbl:'$100'}];
 
-let CFG={phone:'',email:'',negocio:'CoinTrack',ratePerMil:45,minComision:90};
+let CFG={phone:'',email:'',negocio:'CoinTrack',ratePerMil:45,minComision:90,scriptUrl:''};
 try{CFG=Object.assign({},CFG,JSON.parse(localStorage.getItem(CFG_KEY)||'{}'));}catch(e){}
 // Normalize nulls from stored JSON
 CFG.phone=CFG.phone||'';CFG.email=CFG.email||'';
+
+// Si este celular nunca comparte localStorage con la PC del negocio, pega aquí
+// la misma URL de Apps Script configurada en CoinTrack.html (debe ser idéntica).
+const SCRIPT_URL_FALLBACK='';
+function scriptUrl(){return(CFG.scriptUrl||SCRIPT_URL_FALLBACK||'').trim();}
 document.getElementById('hdr-negocio').textContent=CFG.negocio||'CoinTrack';
 
 function calcCommission(total){return Math.max(CFG.minComision||90,((total||0)/1000)*(CFG.ratePerMil||45));}
@@ -247,11 +252,20 @@ function enviarPedido(){
     localStorage.setItem(PENDING_KEY,JSON.stringify(pending));
   }catch(e){}
 
+  sendOrderToSheet(order);
+
   const coins=[...COIN_D].filter(({d})=>vals[d]>0).map(({d,lbl})=>`  • ${lbl}: ${fMon(vals[d])}`).join('\n');
   const bills=[...BILL_D].filter(({d})=>vals[d]>0).map(({d,lbl})=>`  • ${lbl}: ${fMon(vals[d])}`).join('\n');
   const msg=`🪙 *Nuevo Pedido — ${CFG.negocio||'CoinTrack'}*\n━━━━━━━━━━━━━━\n👤 Cliente: ${nombre}\n📞 Tel: ${tel}${order.email?'\n📧 Email: '+order.email:''}\n📅 Pedido: ${fDate(today())}${order.fechaEntrega?'\n🚚 Entrega: '+fDate(order.fechaEntrega):''}\n\n${coins?'🪙 Monedas:\n'+coins:''}${coins&&bills?'\n\n':''}${bills?'💵 Billetes:\n'+bills:''}\n\n💰 Total: ${fMon(totalMonto)}${order.notas?'\n\n📝 Notas: '+order.notas:''}\n━━━━━━━━━━━━━━\nEnviado desde CoinTrack App`;
 
   showConfirm(order,msg,totalMonto);
+}
+
+function sendOrderToSheet(order){
+  const url=scriptUrl();
+  if(!url)return;
+  // text/plain evita el preflight CORS; Apps Script igual lee el JSON crudo del body.
+  fetch(url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(order)}).catch(()=>{});
 }
 
 function showConfirm(order,msg,totalMonto){

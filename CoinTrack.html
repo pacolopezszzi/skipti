@@ -278,10 +278,18 @@ textarea.form-control{resize:vertical;min-height:68px}
         </div>
         <div class="cfg-section">
           <h3>📲 App del Cliente</h3>
-          <p style="font-size:13px;color:#374151;margin-bottom:10px">Abre <strong>CoinTrackCliente.html</strong> en el teléfono del cliente para que pueda capturar pedidos. Los pedidos se sincronizan automáticamente cuando estás en la misma red.</p>
+          <p style="font-size:13px;color:#374151;margin-bottom:10px">Abre <strong>CoinTrackCliente.html</strong> en el teléfono del cliente para que pueda capturar pedidos. Los pedidos llegan desde Google Sheets (vía Apps Script) sin importar la red en la que esté cada dispositivo.</p>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
             <button class="btn btn-primary" onclick="window.open('CoinTrackCliente.html')">Abrir App del Cliente</button>
-            <button class="btn btn-secondary" onclick="checkPending()">Verificar pedidos pendientes</button>
+            <button class="btn btn-secondary" onclick="syncFromSheet(true)">Verificar pedidos pendientes</button>
+          </div>
+        </div>
+        <div class="cfg-section">
+          <h3>📄 Google Sheets (sincronización de pedidos)</h3>
+          <p style="font-size:13px;color:#374151;margin-bottom:10px">Pega aquí la URL del Web App de Apps Script (termina en <code>/exec</code>). Debe ser la misma URL en CoinTrack.html y CoinTrackCliente.html.</p>
+          <div class="form-group">
+            <label class="form-label">URL de Apps Script</label>
+            <input type="text" class="form-control" id="cfg-scripturl" placeholder="https://script.google.com/macros/s/XXXXX/exec" oninput="saveCFG()">
           </div>
         </div>
       </div>
@@ -485,7 +493,9 @@ const DB={clientes:[],puntos:[],recolecciones:[],pedidos:[],transacciones:[],rec
 const KEY='cointk_v2';
 const PENDING_KEY='cointk_pending';
 const CFG_KEY='cointk_cfg';
-let CFG={phone:'',email:'',negocio:'CoinTrack',ratePerMil:45,minComision:90};
+let CFG={phone:'',email:'',negocio:'CoinTrack',ratePerMil:45,minComision:90,scriptUrl:''};
+// Si las dos apps no comparten localStorage (celular distinto a la PC), pega aquí la URL del Web App de Apps Script.
+const SCRIPT_URL_FALLBACK='';
 
 const DENOMS=['0.50','1','2','5','10','20','50','100'];
 const COIN_D=['0.50','1','2','5','10'];
@@ -503,6 +513,7 @@ function saveCFG(){
   CFG.negocio=document.getElementById('cfg-negocio').value.trim()||'CoinTrack';
   CFG.ratePerMil=parseFloat(document.getElementById('cfg-rate').value)||45;
   CFG.minComision=parseFloat(document.getElementById('cfg-mincom').value)||90;
+  CFG.scriptUrl=(document.getElementById('cfg-scripturl').value||'').trim();
   localStorage.setItem(CFG_KEY,JSON.stringify(CFG));
   toast('Configuración guardada');
 }
@@ -512,7 +523,9 @@ function renderCFG(){
   document.getElementById('cfg-negocio').value=CFG.negocio||'';
   document.getElementById('cfg-rate').value=CFG.ratePerMil||45;
   document.getElementById('cfg-mincom').value=CFG.minComision||90;
+  document.getElementById('cfg-scripturl').value=CFG.scriptUrl||SCRIPT_URL_FALLBACK||'';
 }
+function scriptUrl(){return(CFG.scriptUrl||SCRIPT_URL_FALLBACK||'').trim();}
 
 // ==================== UTILS ====================
 function today(){return new Date().toISOString().slice(0,10);}
@@ -610,6 +623,7 @@ function acceptPending(oid){
   localStorage.setItem(PENDING_KEY,JSON.stringify(pending));
   sv();renderPendingBanner();renderPedidos();checkPending();
   toast('Pedido importado: '+pe.folio);
+  markProcessedOnSheet(oid);
 }
 function rejectPending(oid){
   const pending=JSON.parse(localStorage.getItem(PENDING_KEY)||'[]');
@@ -617,10 +631,45 @@ function rejectPending(oid){
   if(o)o.processed=true;
   localStorage.setItem(PENDING_KEY,JSON.stringify(pending));
   renderPendingBanner();checkPending();toast('Pedido rechazado');
+  markProcessedOnSheet(oid);
 }
 window.addEventListener('storage',e=>{
   if(e.key===PENDING_KEY){checkPending();toast('📲 Nuevo pedido desde la App del Cliente','info');}
 });
+
+// ==================== GOOGLE SHEETS SYNC ====================
+async function syncFromSheet(manual){
+  const url=scriptUrl();
+  if(!url)return;
+  try{
+    const res=await fetch(url+'?action=list');
+    const sheetOrders=await res.json();
+    if(!Array.isArray(sheetOrders))return;
+    const pending=JSON.parse(localStorage.getItem(PENDING_KEY)||'[]');
+    const existingIds=new Set(pending.map(p=>String(p.id)));
+    let added=0;
+    sheetOrders.forEach(o=>{
+      if(!existingIds.has(String(o.id))){pending.push(Object.assign({},o,{processed:false}));added++;}
+    });
+    if(added>0){
+      localStorage.setItem(PENDING_KEY,JSON.stringify(pending));
+      toast(`📲 ${added} pedido(s) nuevo(s) desde la App del Cliente`,'info');
+    }else if(manual){
+      toast('Sin pedidos nuevos','info');
+    }
+    checkPending();
+    if(currentSec==='pedidos')renderPendingBanner();
+  }catch(e){
+    console.error('Error sincronizando con Google Sheets:',e);
+    if(manual)toast('No se pudo conectar con Google Sheets','err');
+  }
+}
+function markProcessedOnSheet(oid){
+  const url=scriptUrl();
+  if(!url)return;
+  fetch(url+'?action=markProcessed&id='+encodeURIComponent(oid)).catch(()=>{});
+}
+setInterval(()=>syncFromSheet(false),20000);
 
 // ==================== CLIENTES ====================
 function openCliente(id){
@@ -1018,7 +1067,7 @@ function renderRecurrentes(){
 }
 
 // ==================== INIT ====================
-ld();ldCFG();checkPending();checkRecurrentes();
+ld();ldCFG();checkPending();checkRecurrentes();syncFromSheet(false);
 document.getElementById('topbar-date').textContent=new Date().toLocaleDateString('es-MX',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
 nav('dashboard');
 </script>
