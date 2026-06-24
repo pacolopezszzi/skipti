@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hacer un Pedido</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{height:100%;-webkit-text-size-adjust:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f0fdf4;color:#1a202c;min-height:100%;padding-bottom:32px}
+
+.header{background:linear-gradient(135deg,#1e3a5f 0%,#1e5f4a 100%);color:#fff;padding:24px 20px 20px;text-align:center}
+.header-logo{font-size:32px;margin-bottom:6px}
+.header h1{font-size:20px;font-weight:700}
+.header p{font-size:13px;opacity:.7;margin-top:3px}
+
+.container{max-width:480px;margin:0 auto;padding:0 16px}
+
+.card{background:#fff;border-radius:14px;padding:18px;margin-top:16px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.card-title{font-size:15px;font-weight:700;color:#1e3a5f;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+
+.form-group{margin-bottom:14px}
+.form-label{display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:5px}
+.form-control{width:100%;padding:11px 13px;border:1.5px solid #d1d5db;border-radius:10px;font-size:15px;color:#1a202c;background:#fff;-webkit-appearance:none}
+.form-control:focus{outline:none;border-color:#16a34a;box-shadow:0 0 0 3px rgba(22,163,74,.12)}
+
+.denom-section{margin-bottom:10px}
+.denom-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:5px 0;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.denom-section-title.coin{color:#92400e;border-bottom:2px solid #fcd34d}
+.denom-section-title.bill{color:#065f46;border-bottom:2px solid #6ee7b7}
+
+.denom-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f1f5f9}
+.denom-row:last-child{border-bottom:none}
+.denom-label{font-size:16px;font-weight:700;color:#1a202c;min-width:52px}
+.denom-sub{font-size:11px;color:#94a3b8;margin-top:1px}
+.denom-input{width:110px;height:42px;border:1.5px solid #d1d5db;border-radius:10px;text-align:right;font-size:16px;font-weight:700;color:#1a202c;background:#fff;padding:0 10px;-webkit-appearance:none;-moz-appearance:textfield}
+.denom-input:focus{outline:none;border-color:#16a34a;box-shadow:0 0 0 3px rgba(22,163,74,.12)}
+.denom-prefix{font-size:16px;font-weight:600;color:#64748b;margin-right:4px}
+
+.total-bar{background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:12px 14px;margin-top:12px}
+.total-bar-lbl{font-size:12px;color:#15803d;font-weight:600}
+.total-bar-val{font-size:18px;font-weight:700;color:#166534}
+.total-bar-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0}
+.total-bar-row.commission{border-top:1px solid #bbf7d0;margin-top:6px;padding-top:8px}
+
+.btn-submit{display:block;width:100%;padding:16px;background:linear-gradient(135deg,#16a34a,#0d9488);color:#fff;border:none;border-radius:12px;font-size:17px;font-weight:700;cursor:pointer;margin-top:18px;-webkit-tap-highlight-color:transparent}
+.btn-submit:active{opacity:.9}
+.btn-submit:disabled{opacity:.5;cursor:not-allowed}
+
+/* CONFIRMACIÓN */
+.confirm-wrap{display:none;max-width:480px;margin:0 auto;padding:0 16px}
+.confirm-icon{font-size:64px;text-align:center;margin:32px 0 16px}
+.confirm-title{font-size:22px;font-weight:700;color:#15803d;text-align:center;margin-bottom:6px}
+.confirm-sub{font-size:14px;color:#64748b;text-align:center;margin-bottom:20px}
+.confirm-summary{background:#fff;border-radius:14px;padding:18px;box-shadow:0 2px 8px rgba(0,0,0,.08);margin-bottom:14px}
+.confirm-summary h3{font-size:14px;font-weight:700;color:#1e3a5f;margin-bottom:10px}
+.confirm-row{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-bottom:1px solid #f1f5f9}
+.confirm-row:last-child{border-bottom:none}
+.confirm-row span:first-child{color:#64748b}
+.confirm-row span:last-child{font-weight:600}
+
+.btn-wa{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:15px;background:#25d366;color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;text-decoration:none;margin-bottom:10px;-webkit-tap-highlight-color:transparent}
+.btn-email{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:15px;background:#2563eb;color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;text-decoration:none;margin-bottom:10px;-webkit-tap-highlight-color:transparent}
+.btn-nuevo{display:block;width:100%;padding:13px;background:#f1f5f9;color:#374151;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;text-align:center;-webkit-tap-highlight-color:transparent}
+.btn-copy{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:15px;background:#7c3aed;color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;margin-bottom:10px;-webkit-tap-highlight-color:transparent}
+
+.req{color:#dc2626}
+.error-msg{font-size:12px;color:#dc2626;margin-top:4px;display:none}
+.error-msg.show{display:block}
+</style>
+</head>
+<body>
+
+<!-- FORM -->
+<div id="form-wrap">
+  <div class="header">
+    <div class="header-logo">🪙</div>
+    <h1 id="hdr-negocio">CoinTrack</h1>
+    <p>Captura tu pedido de monedas y billetes</p>
+  </div>
+
+  <div class="container">
+    <!-- Datos -->
+    <div class="card">
+      <div class="card-title">👤 Tus Datos</div>
+      <div class="form-group">
+        <label class="form-label">Nombre <span class="req">*</span></label>
+        <input class="form-control" id="cl-nombre" type="text" placeholder="Tu nombre completo" autocomplete="name">
+        <div class="error-msg" id="err-nombre">Por favor ingresa tu nombre</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Teléfono <span class="req">*</span></label>
+        <input class="form-control" id="cl-tel" type="tel" placeholder="55 1234 5678" autocomplete="tel">
+        <div class="error-msg" id="err-tel">Por favor ingresa tu teléfono</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email <span style="color:#94a3b8">(opcional)</span></label>
+        <input class="form-control" id="cl-email" type="email" placeholder="tu@correo.com" autocomplete="email">
+      </div>
+    </div>
+
+    <!-- Pedido -->
+    <div class="card">
+      <div class="card-title">🪙 Tu Pedido</div>
+
+      <div class="denom-section">
+        <div class="denom-section-title coin">🪙 Monedas — ingresa el monto en pesos</div>
+        <div id="coins-list"></div>
+      </div>
+
+      <div class="denom-section" style="margin-top:14px">
+        <div class="denom-section-title bill">💵 Billetes — ingresa el monto en pesos</div>
+        <div id="bills-list"></div>
+      </div>
+
+      <div class="total-bar">
+        <div class="total-bar-row">
+          <div class="total-bar-lbl">Total del pedido</div>
+          <div class="total-bar-val" id="cl-total-val">$0.00</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detalles -->
+    <div class="card">
+      <div class="card-title">📋 Detalles</div>
+      <div class="form-group">
+        <label class="form-label">Fecha de entrega deseada</label>
+        <input class="form-control" id="cl-fentrega" type="date">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notas adicionales</label>
+        <textarea class="form-control" id="cl-notas" rows="3" placeholder="Instrucciones especiales, horario de entrega..."></textarea>
+      </div>
+    </div>
+
+    <button class="btn-submit" id="btn-enviar" onclick="enviarPedido()">Enviar Pedido</button>
+    <div class="error-msg" id="err-monto" style="text-align:center;margin-top:8px">Por favor ingresa al menos un monto</div>
+    <p style="font-size:11px;color:#94a3b8;text-align:center;margin-top:12px">Al enviar podrás notificar por WhatsApp o Email</p>
+  </div>
+</div>
+
+<!-- CONFIRMACIÓN -->
+<div class="confirm-wrap" id="confirm-wrap">
+  <div class="confirm-icon">✅</div>
+  <div class="confirm-title">¡Pedido Enviado!</div>
+  <div class="confirm-sub">Tu pedido fue registrado. Notifica al negocio:</div>
+
+  <div class="container">
+    <div class="confirm-summary">
+      <h3>Resumen de tu pedido</h3>
+      <div id="confirm-rows"></div>
+    </div>
+
+    <p id="no-contact-note" style="display:none;font-size:12px;color:#94a3b8;text-align:center;padding:10px 0 4px">Configura el teléfono y email en CoinTrack para habilitar notificaciones directas.</p>
+    <a id="btn-wa" href="#" target="_blank" rel="noopener" class="btn-wa">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Enviar por WhatsApp
+    </a>
+    <a id="btn-email" href="#" class="btn-email">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      Enviar por Email
+    </a>
+    <button id="btn-copy" class="btn-copy">📋 Copiar Mensaje</button>
+    <button class="btn-nuevo" onclick="nuevoPedido()">+ Hacer otro pedido</button>
+  </div>
+</div>
+
+<script>
+const PENDING_KEY='cointk_pending';
+const CFG_KEY='cointk_cfg';
+const COIN_D=[{d:'0.50',lbl:'$0.50'},{d:'1',lbl:'$1'},{d:'2',lbl:'$2'},{d:'5',lbl:'$5'},{d:'10',lbl:'$10'}];
+const BILL_D=[{d:'20',lbl:'$20'},{d:'50',lbl:'$50'},{d:'100',lbl:'$100'}];
+
+let CFG={phone:'',email:'',negocio:'CoinTrack',ratePerMil:45,minComision:90};
+try{CFG=Object.assign({},CFG,JSON.parse(localStorage.getItem(CFG_KEY)||'{}'));}catch(e){}
+// Normalize nulls from stored JSON
+CFG.phone=CFG.phone||'';CFG.email=CFG.email||'';
+document.getElementById('hdr-negocio').textContent=CFG.negocio||'CoinTrack';
+
+function calcCommission(total){return Math.max(CFG.minComision||90,((total||0)/1000)*(CFG.ratePerMil||45));}
+
+function buildList(items,containerId){
+  const el=document.getElementById(containerId);
+  el.innerHTML=items.map(({d,lbl})=>`
+    <div class="denom-row">
+      <div><div class="denom-label">${lbl}</div><div class="denom-sub">monto en pesos</div></div>
+      <div style="display:flex;align-items:center">
+        <span class="denom-prefix">$</span>
+        <input type="text" inputmode="decimal" class="denom-input" id="v-${d.replace('.','_')}" placeholder="0" autocomplete="off" oninput="updTotal()">
+      </div>
+    </div>`).join('');
+}
+buildList(COIN_D,'coins-list');
+buildList(BILL_D,'bills-list');
+
+function getVals(){
+  const v={};
+  [...COIN_D,...BILL_D].forEach(({d})=>{
+    const raw=(document.getElementById('v-'+d.replace('.','_'))?.value||'').replace(',','.');
+    v[d]=parseFloat(raw)||0;
+  });
+  return v;
+}
+
+function updTotal(){
+  const vals=getVals();
+  const total=Object.values(vals).reduce((s,v)=>s+v,0);
+  document.getElementById('cl-total-val').textContent=fMon(total);
+}
+
+function fMon(n){return'$'+parseFloat(n||0).toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function fDate(d){if(!d)return'-';const[y,m,dd]=d.split('-');return`${dd}/${m}/${y}`;}
+function today(){return new Date().toISOString().slice(0,10);}
+
+function enviarPedido(){
+  const nombre=(document.getElementById('cl-nombre').value||'').trim();
+  const tel=(document.getElementById('cl-tel').value||'').trim();
+  document.getElementById('err-nombre').classList.toggle('show',!nombre);
+  document.getElementById('err-tel').classList.toggle('show',!tel);
+  if(!nombre||!tel)return;
+
+  const vals=getVals();
+  const totalMonto=Object.values(vals).reduce((s,v)=>s+v,0);
+  const errMonto=document.getElementById('err-monto');
+  if(totalMonto===0){errMonto.classList.add('show');return;}
+  errMonto.classList.remove('show');
+
+  const denoms={};
+  [...COIN_D,...BILL_D].forEach(({d})=>{denoms[d]=vals[d]||0;});
+  const commission=calcCommission(totalMonto);
+
+  const order={
+    id:'cli-'+Date.now(),
+    fecha:today(),
+    nombre,tel,
+    email:(document.getElementById('cl-email').value||'').trim(),
+    denoms,totalMonto,commission,
+    fechaEntrega:document.getElementById('cl-fentrega').value||'',
+    notas:(document.getElementById('cl-notas').value||'').trim(),
+    processed:false
+  };
+
+  try{
+    const pending=JSON.parse(localStorage.getItem(PENDING_KEY)||'[]');
+    pending.push(order);
+    localStorage.setItem(PENDING_KEY,JSON.stringify(pending));
+  }catch(e){}
+
+  const coins=[...COIN_D].filter(({d})=>vals[d]>0).map(({d,lbl})=>`  • ${lbl}: ${fMon(vals[d])}`).join('\n');
+  const bills=[...BILL_D].filter(({d})=>vals[d]>0).map(({d,lbl})=>`  • ${lbl}: ${fMon(vals[d])}`).join('\n');
+  const msg=`🪙 *Nuevo Pedido — ${CFG.negocio||'CoinTrack'}*\n━━━━━━━━━━━━━━\n👤 Cliente: ${nombre}\n📞 Tel: ${tel}${order.email?'\n📧 Email: '+order.email:''}\n📅 Pedido: ${fDate(today())}${order.fechaEntrega?'\n🚚 Entrega: '+fDate(order.fechaEntrega):''}\n\n${coins?'🪙 Monedas:\n'+coins:''}${coins&&bills?'\n\n':''}${bills?'💵 Billetes:\n'+bills:''}\n\n💰 Total: ${fMon(totalMonto)}${order.notas?'\n\n📝 Notas: '+order.notas:''}\n━━━━━━━━━━━━━━\nEnviado desde CoinTrack App`;
+
+  showConfirm(order,msg,totalMonto);
+}
+
+function showConfirm(order,msg,totalMonto){
+  document.getElementById('form-wrap').style.display='none';
+  document.getElementById('confirm-wrap').style.display='block';
+  window.scrollTo(0,0);
+
+  const rows=[];
+  rows.push({l:'Cliente',v:order.nombre});
+  rows.push({l:'Teléfono',v:order.tel});
+  if(order.fechaEntrega)rows.push({l:'Entrega deseada',v:fDate(order.fechaEntrega)});
+  [...COIN_D,...BILL_D].forEach(({d,lbl})=>{if((order.denoms[d]||0)>0)rows.push({l:lbl,v:fMon(order.denoms[d])});});
+  rows.push({l:'Total del pedido',v:fMon(totalMonto)});
+  if(order.notas)rows.push({l:'Notas',v:order.notas});
+  document.getElementById('confirm-rows').innerHTML=rows.map(r=>`<div class="confirm-row"><span>${r.l}</span><span>${r.v}</span></div>`).join('');
+
+  const waEl=document.getElementById('btn-wa');
+  const emEl=document.getElementById('btn-email');
+  const cpEl=document.getElementById('btn-copy');
+  const noteEl=document.getElementById('no-contact-note');
+
+  const phone=CFG.phone.replace(/\D/g,'');
+  if(phone){waEl.href=`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;waEl.style.display='';}
+  else{waEl.style.display='none';}
+
+  if(CFG.email){emEl.href=`mailto:${CFG.email}?subject=${encodeURIComponent('Nuevo Pedido - '+order.nombre)}&body=${encodeURIComponent(msg)}`;emEl.style.display='';}
+  else{emEl.style.display='none';}
+
+  cpEl.onclick=()=>copyMsg(msg,cpEl);
+  cpEl.textContent='📋 Copiar Mensaje';
+  cpEl.style.display='';
+
+  noteEl.style.display=(!phone&&!CFG.email)?'block':'none';
+}
+
+function copyMsg(msg,btn){
+  const reset=()=>{if(btn){btn.textContent='📋 Copiar Mensaje';}};
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(msg).then(()=>{if(btn)btn.textContent='✓ ¡Copiado!';setTimeout(reset,2500);}).catch(()=>fallbackCopy(msg,btn,reset));
+  }else{fallbackCopy(msg,btn,reset);}
+}
+function fallbackCopy(msg,btn,reset){
+  const ta=document.createElement('textarea');
+  ta.value=msg;ta.style.cssText='position:fixed;top:0;left:0;opacity:0;';
+  document.body.appendChild(ta);ta.focus();ta.select();
+  try{document.execCommand('copy');if(btn)btn.textContent='✓ ¡Copiado!';}catch(e){if(btn)btn.textContent='Error al copiar';}
+  document.body.removeChild(ta);setTimeout(reset,2500);
+}
+
+function nuevoPedido(){
+  [...COIN_D,...BILL_D].forEach(({d})=>{const el=document.getElementById('v-'+d.replace('.','_'));if(el)el.value='';});
+  updTotal();
+  ['cl-nombre','cl-tel','cl-email','cl-notas','cl-fentrega'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['err-nombre','err-tel','err-monto'].forEach(id=>document.getElementById(id).classList.remove('show'));
+  document.getElementById('confirm-wrap').style.display='none';
+  document.getElementById('form-wrap').style.display='block';
+  window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>
