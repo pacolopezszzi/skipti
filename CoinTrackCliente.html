@@ -3,70 +3,183 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1e3a5f">
 <title>Hacer un Pedido</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{height:100%;-webkit-text-size-adjust:100%}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f0fdf4;color:#1a202c;min-height:100%;padding-bottom:32px}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  background:#f0fdf4;color:#1a202c;min-height:100%;
+}
 
-.header{background:linear-gradient(135deg,#1e3a5f 0%,#1e5f4a 100%);color:#fff;padding:24px 20px 20px;text-align:center}
-.header-logo{font-size:32px;margin-bottom:6px}
-.header h1{font-size:20px;font-weight:700}
-.header p{font-size:13px;opacity:.7;margin-top:3px}
+/* HEADER */
+.header{
+  background:linear-gradient(140deg,#1e3a5f 0%,#0f5c3e 100%);
+  color:#fff;padding:16px 18px 20px;
+  padding-top:max(16px, env(safe-area-inset-top,16px));
+}
+.header-inner{display:flex;align-items:center;gap:12px}
+.header-icon{
+  width:46px;height:46px;background:rgba(255,255,255,.18);
+  border-radius:13px;display:flex;align-items:center;
+  justify-content:center;font-size:26px;flex-shrink:0
+}
+.header h1{font-size:19px;font-weight:700;line-height:1.2}
+.header p{font-size:12px;opacity:.65;margin-top:2px}
 
-.container{max-width:480px;margin:0 auto;padding:0 16px}
+/* CONTAINER */
+.container{padding:0 14px 14px;max-width:520px;margin:0 auto}
 
-.card{background:#fff;border-radius:14px;padding:18px;margin-top:16px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
-.card-title{font-size:15px;font-weight:700;color:#1e3a5f;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+/* CARD */
+.card{
+  background:#fff;border-radius:18px;padding:18px;
+  margin-top:14px;box-shadow:0 1px 6px rgba(0,0,0,.07);
+  border:1px solid rgba(0,0,0,.05)
+}
+.card-title{
+  font-size:14px;font-weight:700;color:#1e3a5f;
+  margin-bottom:16px;display:flex;align-items:center;gap:7px
+}
 
+/* FORM */
 .form-group{margin-bottom:14px}
-.form-label{display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:5px}
-.form-control{width:100%;padding:11px 13px;border:1.5px solid #d1d5db;border-radius:10px;font-size:15px;color:#1a202c;background:#fff;-webkit-appearance:none}
-.form-control:focus{outline:none;border-color:#16a34a;box-shadow:0 0 0 3px rgba(22,163,74,.12)}
+.form-label{display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:6px}
+.form-control{
+  width:100%;padding:13px 14px;border:1.5px solid #e2e8f0;
+  border-radius:13px;font-size:16px;color:#1a202c;background:#fff;
+  -webkit-appearance:none;transition:border-color .15s,box-shadow .15s
+}
+.form-control:focus{outline:none;border-color:#16a34a;box-shadow:0 0 0 3px rgba(22,163,74,.1)}
+textarea.form-control{resize:vertical;min-height:80px;font-size:15px;line-height:1.5}
+.req{color:#dc2626}
 
-.denom-section{margin-bottom:10px}
-.denom-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:5px 0;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+/* DENOMINACIONES */
+.denom-section-title{
+  font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;
+  padding-bottom:9px;margin-bottom:4px;display:flex;align-items:center;gap:6px
+}
 .denom-section-title.coin{color:#92400e;border-bottom:2px solid #fcd34d}
 .denom-section-title.bill{color:#065f46;border-bottom:2px solid #6ee7b7}
 
-.denom-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f1f5f9}
+.denom-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:11px 0;border-bottom:1px solid #f1f5f9;gap:10px
+}
 .denom-row:last-child{border-bottom:none}
-.denom-label{font-size:16px;font-weight:700;color:#1a202c;min-width:52px}
+.denom-info{flex:1;min-width:0}
+.denom-label{font-size:17px;font-weight:700;color:#1a202c}
 .denom-sub{font-size:11px;color:#94a3b8;margin-top:1px}
-.denom-input{width:110px;height:42px;border:1.5px solid #d1d5db;border-radius:10px;text-align:right;font-size:16px;font-weight:700;color:#1a202c;background:#fff;padding:0 10px;-webkit-appearance:none;-moz-appearance:textfield}
-.denom-input:focus{outline:none;border-color:#16a34a;box-shadow:0 0 0 3px rgba(22,163,74,.12)}
-.denom-prefix{font-size:16px;font-weight:600;color:#64748b;margin-right:4px}
+.denom-input-wrap{display:flex;align-items:center;gap:5px;flex-shrink:0}
+.denom-prefix{font-size:16px;font-weight:600;color:#64748b}
+.denom-input{
+  width:120px;height:52px;border:1.5px solid #e2e8f0;border-radius:12px;
+  text-align:right;font-size:18px;font-weight:700;color:#1a202c;
+  background:#fff;padding:0 12px;
+  -webkit-appearance:none;-moz-appearance:textfield;
+  transition:border-color .15s,background .15s,color .15s
+}
+.denom-input:focus{outline:none;border-color:#16a34a;box-shadow:0 0 0 3px rgba(22,163,74,.1)}
+.denom-input:not(:placeholder-shown):not([value=""]){
+  border-color:#86efac;background:#f0fdf4;color:#166534
+}
 
-.total-bar{background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:12px 14px;margin-top:12px}
-.total-bar-lbl{font-size:12px;color:#15803d;font-weight:600}
-.total-bar-val{font-size:18px;font-weight:700;color:#166534}
-.total-bar-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0}
-.total-bar-row.commission{border-top:1px solid #bbf7d0;margin-top:6px;padding-top:8px}
-
-.btn-submit{display:block;width:100%;padding:16px;background:linear-gradient(135deg,#16a34a,#0d9488);color:#fff;border:none;border-radius:12px;font-size:17px;font-weight:700;cursor:pointer;margin-top:18px;-webkit-tap-highlight-color:transparent}
+/* STICKY SUBMIT BAR */
+.submit-bar{
+  position:sticky;bottom:0;
+  background:#fff;border-top:1px solid #e2e8f0;
+  padding:12px 16px;
+  padding-bottom:max(12px, env(safe-area-inset-bottom,12px));
+  box-shadow:0 -4px 20px rgba(0,0,0,.1)
+}
+.submit-bar-total{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:10px
+}
+.total-label{font-size:13px;font-weight:600;color:#374151}
+.total-val{font-size:22px;font-weight:800;color:#166534}
+.btn-submit{
+  display:block;width:100%;padding:16px;
+  background:linear-gradient(135deg,#16a34a 0%,#0d9488 100%);
+  color:#fff;border:none;border-radius:14px;
+  font-size:17px;font-weight:700;cursor:pointer;letter-spacing:.01em;
+  -webkit-tap-highlight-color:transparent;transition:opacity .1s;
+  box-shadow:0 4px 14px rgba(22,163,74,.35)
+}
 .btn-submit:active{opacity:.9}
-.btn-submit:disabled{opacity:.5;cursor:not-allowed}
+.btn-submit:disabled{opacity:.5;cursor:not-allowed;box-shadow:none}
+.error-msg{font-size:12px;color:#dc2626;margin-top:6px;display:none;text-align:center}
+.error-msg.show{display:block}
+.field-err{font-size:12px;color:#dc2626;margin-top:4px;display:none}
+.field-err.show{display:block}
 
-/* CONFIRMACIÓN */
-.confirm-wrap{display:none;max-width:480px;margin:0 auto;padding:0 16px}
-.confirm-icon{font-size:64px;text-align:center;margin:32px 0 16px}
-.confirm-title{font-size:22px;font-weight:700;color:#15803d;text-align:center;margin-bottom:6px}
-.confirm-sub{font-size:14px;color:#64748b;text-align:center;margin-bottom:20px}
-.confirm-summary{background:#fff;border-radius:14px;padding:18px;box-shadow:0 2px 8px rgba(0,0,0,.08);margin-bottom:14px}
-.confirm-summary h3{font-size:14px;font-weight:700;color:#1e3a5f;margin-bottom:10px}
-.confirm-row{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-bottom:1px solid #f1f5f9}
+/* CONFIRM SCREEN */
+.confirm-wrap{display:none}
+.confirm-header{
+  background:linear-gradient(140deg,#166534 0%,#0f766e 100%);
+  color:#fff;padding:40px 20px 36px;text-align:center;
+  padding-top:max(40px,env(safe-area-inset-top,40px))
+}
+.confirm-icon{
+  display:block;font-size:72px;margin-bottom:14px;
+  animation:popIn .45s cubic-bezier(.2,1.4,.4,1) forwards
+}
+@keyframes popIn{0%{transform:scale(.4);opacity:0}100%{transform:scale(1);opacity:1}}
+.confirm-title{font-size:24px;font-weight:800;margin-bottom:5px}
+.confirm-sub{font-size:14px;opacity:.72}
+
+.confirm-body{
+  padding:0 14px 32px;max-width:520px;margin:0 auto;
+  padding-bottom:max(32px,env(safe-area-inset-bottom,32px))
+}
+.confirm-summary{
+  background:#fff;border-radius:18px;padding:18px;
+  box-shadow:0 1px 6px rgba(0,0,0,.07);border:1px solid rgba(0,0,0,.05);
+  margin-top:16px;margin-bottom:14px
+}
+.confirm-summary h3{font-size:14px;font-weight:700;color:#1e3a5f;margin-bottom:12px}
+.confirm-row{
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:13px;padding:7px 0;border-bottom:1px solid #f1f5f9
+}
 .confirm-row:last-child{border-bottom:none}
 .confirm-row span:first-child{color:#64748b}
-.confirm-row span:last-child{font-weight:600}
+.confirm-row span:last-child{font-weight:600;color:#1a202c}
 
-.btn-wa{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:15px;background:#25d366;color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;text-decoration:none;margin-bottom:10px;-webkit-tap-highlight-color:transparent}
-.btn-email{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:15px;background:#2563eb;color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;text-decoration:none;margin-bottom:10px;-webkit-tap-highlight-color:transparent}
-.btn-nuevo{display:block;width:100%;padding:13px;background:#f1f5f9;color:#374151;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;text-align:center;-webkit-tap-highlight-color:transparent}
-.btn-copy{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:15px;background:#7c3aed;color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;margin-bottom:10px;-webkit-tap-highlight-color:transparent}
-
-.req{color:#dc2626}
-.error-msg{font-size:12px;color:#dc2626;margin-top:4px;display:none}
-.error-msg.show{display:block}
+.confirm-actions{display:flex;flex-direction:column;gap:10px}
+.btn-wa{
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  width:100%;padding:16px;background:#25d366;color:#fff;border:none;
+  border-radius:14px;font-size:16px;font-weight:700;cursor:pointer;
+  text-decoration:none;-webkit-tap-highlight-color:transparent;
+  box-shadow:0 4px 12px rgba(37,211,102,.3)
+}
+.btn-email{
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  width:100%;padding:16px;background:#2563eb;color:#fff;border:none;
+  border-radius:14px;font-size:16px;font-weight:700;cursor:pointer;
+  text-decoration:none;-webkit-tap-highlight-color:transparent;
+  box-shadow:0 4px 12px rgba(37,99,235,.25)
+}
+.btn-copy{
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  width:100%;padding:16px;background:#7c3aed;color:#fff;border:none;
+  border-radius:14px;font-size:16px;font-weight:700;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  box-shadow:0 4px 12px rgba(124,58,237,.25)
+}
+.btn-nuevo{
+  display:block;width:100%;padding:14px;background:#f1f5f9;
+  color:#374151;border:none;border-radius:14px;font-size:15px;
+  font-weight:600;cursor:pointer;text-align:center;
+  -webkit-tap-highlight-color:transparent
+}
+.no-contact-note{
+  font-size:12px;color:#94a3b8;text-align:center;padding:8px 0 4px;display:none
+}
 </style>
 </head>
 <body>
@@ -74,9 +187,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <!-- FORM -->
 <div id="form-wrap">
   <div class="header">
-    <div class="header-logo">🪙</div>
-    <h1 id="hdr-negocio">CoinTrack</h1>
-    <p>Captura tu pedido de monedas y billetes</p>
+    <div class="header-inner">
+      <div class="header-icon">🪙</div>
+      <div>
+        <h1 id="hdr-negocio">CoinTrack</h1>
+        <p>Captura tu pedido de monedas y billetes</p>
+      </div>
+    </div>
   </div>
 
   <div class="container">
@@ -86,83 +203,86 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
       <div class="form-group">
         <label class="form-label">Nombre <span class="req">*</span></label>
         <input class="form-control" id="cl-nombre" type="text" placeholder="Tu nombre completo" autocomplete="name">
-        <div class="error-msg" id="err-nombre">Por favor ingresa tu nombre</div>
+        <div class="field-err" id="err-nombre">Por favor ingresa tu nombre</div>
       </div>
       <div class="form-group">
         <label class="form-label">Teléfono <span class="req">*</span></label>
         <input class="form-control" id="cl-tel" type="tel" placeholder="55 1234 5678" autocomplete="tel">
-        <div class="error-msg" id="err-tel">Por favor ingresa tu teléfono</div>
+        <div class="field-err" id="err-tel">Por favor ingresa tu teléfono</div>
       </div>
-      <div class="form-group">
-        <label class="form-label">Email <span style="color:#94a3b8">(opcional)</span></label>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Email <span style="color:#94a3b8;font-weight:400">(opcional)</span></label>
         <input class="form-control" id="cl-email" type="email" placeholder="tu@correo.com" autocomplete="email">
       </div>
     </div>
 
-    <!-- Pedido -->
+    <!-- Monedas -->
     <div class="card">
-      <div class="card-title">🪙 Tu Pedido</div>
+      <div class="denom-section-title coin">🪙 Monedas — monto en pesos</div>
+      <div id="coins-list"></div>
+    </div>
 
-      <div class="denom-section">
-        <div class="denom-section-title coin">🪙 Monedas — ingresa el monto en pesos</div>
-        <div id="coins-list"></div>
-      </div>
-
-      <div class="denom-section" style="margin-top:14px">
-        <div class="denom-section-title bill">💵 Billetes — ingresa el monto en pesos</div>
-        <div id="bills-list"></div>
-      </div>
-
-      <div class="total-bar">
-        <div class="total-bar-row">
-          <div class="total-bar-lbl">Total del pedido</div>
-          <div class="total-bar-val" id="cl-total-val">$0.00</div>
-        </div>
-      </div>
+    <!-- Billetes -->
+    <div class="card">
+      <div class="denom-section-title bill">💵 Billetes — monto en pesos</div>
+      <div id="bills-list"></div>
     </div>
 
     <!-- Detalles -->
     <div class="card">
-      <div class="card-title">📋 Detalles</div>
+      <div class="card-title">📋 Detalles del Pedido</div>
       <div class="form-group">
         <label class="form-label">Fecha de entrega deseada</label>
         <input class="form-control" id="cl-fentrega" type="date">
       </div>
-      <div class="form-group">
+      <div class="form-group" style="margin-bottom:0">
         <label class="form-label">Notas adicionales</label>
         <textarea class="form-control" id="cl-notas" rows="3" placeholder="Instrucciones especiales, horario de entrega..."></textarea>
       </div>
     </div>
+  </div>
 
-    <button class="btn-submit" id="btn-enviar" onclick="enviarPedido()">Enviar Pedido</button>
-    <div class="error-msg" id="err-monto" style="text-align:center;margin-top:8px">Por favor ingresa al menos un monto</div>
-    <p style="font-size:11px;color:#94a3b8;text-align:center;margin-top:12px">Al enviar podrás notificar por WhatsApp o Email</p>
+  <!-- STICKY SUBMIT BAR -->
+  <div class="submit-bar">
+    <div class="submit-bar-total">
+      <span class="total-label">Total del pedido</span>
+      <span class="total-val" id="cl-total-val">$0.00</span>
+    </div>
+    <button class="btn-submit" id="btn-enviar" onclick="enviarPedido()">Enviar Pedido →</button>
+    <div class="error-msg" id="err-monto">Por favor ingresa al menos un monto</div>
   </div>
 </div>
 
 <!-- CONFIRMACIÓN -->
 <div class="confirm-wrap" id="confirm-wrap">
-  <div class="confirm-icon">✅</div>
-  <div class="confirm-title">¡Pedido Enviado!</div>
-  <div class="confirm-sub">Tu pedido fue registrado. Notifica al negocio:</div>
+  <div class="confirm-header">
+    <span class="confirm-icon">✅</span>
+    <div class="confirm-title">¡Pedido Enviado!</div>
+    <div class="confirm-sub">Tu pedido fue registrado con éxito</div>
+  </div>
 
-  <div class="container">
+  <div class="confirm-body">
     <div class="confirm-summary">
       <h3>Resumen de tu pedido</h3>
       <div id="confirm-rows"></div>
     </div>
 
-    <p id="no-contact-note" style="display:none;font-size:12px;color:#94a3b8;text-align:center;padding:10px 0 4px">Configura el teléfono y email en CoinTrack para habilitar notificaciones directas.</p>
-    <a id="btn-wa" href="#" target="_blank" rel="noopener" class="btn-wa">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-      Enviar por WhatsApp
-    </a>
-    <a id="btn-email" href="#" class="btn-email">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-      Enviar por Email
-    </a>
-    <button id="btn-copy" class="btn-copy">📋 Copiar Mensaje</button>
-    <button class="btn-nuevo" onclick="nuevoPedido()">+ Hacer otro pedido</button>
+    <p id="no-contact-note" class="no-contact-note">
+      Configura el teléfono y email en CoinTrack para habilitar notificaciones directas.
+    </p>
+
+    <div class="confirm-actions">
+      <a id="btn-wa" href="#" target="_blank" rel="noopener" class="btn-wa">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Enviar por WhatsApp
+      </a>
+      <a id="btn-email" href="#" class="btn-email">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        Enviar por Email
+      </a>
+      <button id="btn-copy" class="btn-copy">📋 Copiar Mensaje</button>
+      <button class="btn-nuevo" onclick="nuevoPedido()">+ Hacer otro pedido</button>
+    </div>
   </div>
 </div>
 
@@ -174,11 +294,8 @@ const BILL_D=[{d:'20',lbl:'$20'},{d:'50',lbl:'$50'},{d:'100',lbl:'$100'}];
 
 let CFG={phone:'',email:'',negocio:'CoinTrack',ratePerMil:45,minComision:90,scriptUrl:''};
 try{CFG=Object.assign({},CFG,JSON.parse(localStorage.getItem(CFG_KEY)||'{}'));}catch(e){}
-// Normalize nulls from stored JSON
 CFG.phone=CFG.phone||'';CFG.email=CFG.email||'';
 
-// Si este celular nunca comparte localStorage con la PC del negocio, pega aquí
-// la misma URL de Apps Script configurada en CoinTrack.html (debe ser idéntica).
 const SCRIPT_URL_FALLBACK='https://script.google.com/macros/s/AKfycbzrd3s3Q29NPRS9j6BZeFgnlYGlDjiIGdjU0guODK8f1tcPUzmgwjVl3c0FPNnMakBu/exec';
 function scriptUrl(){return(CFG.scriptUrl||SCRIPT_URL_FALLBACK||'').trim();}
 document.getElementById('hdr-negocio').textContent=CFG.negocio||'CoinTrack';
@@ -189,8 +306,11 @@ function buildList(items,containerId){
   const el=document.getElementById(containerId);
   el.innerHTML=items.map(({d,lbl})=>`
     <div class="denom-row">
-      <div><div class="denom-label">${lbl}</div><div class="denom-sub">monto en pesos</div></div>
-      <div style="display:flex;align-items:center">
+      <div class="denom-info">
+        <div class="denom-label">${lbl}</div>
+        <div class="denom-sub">monto en pesos</div>
+      </div>
+      <div class="denom-input-wrap">
         <span class="denom-prefix">$</span>
         <input type="text" inputmode="decimal" class="denom-input" id="v-${d.replace('.','_')}" placeholder="0" autocomplete="off" oninput="updTotal()">
       </div>
@@ -264,7 +384,6 @@ function enviarPedido(){
 function sendOrderToSheet(order){
   const url=scriptUrl();
   if(!url)return;
-  // text/plain evita el preflight CORS; Apps Script igual lee el JSON crudo del body.
   fetch(url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(order)}).catch(()=>{});
 }
 

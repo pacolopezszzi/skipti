@@ -126,6 +126,70 @@ textarea.form-control{resize:vertical;min-height:68px}
 .tab.active{background:#fff;color:#1e3a5f;box-shadow:0 1px 3px rgba(0,0,0,.1);font-weight:600}
 .rec-badge{display:inline-flex;align-items:center;background:#dbeafe;color:#1d4ed8;border-radius:20px;font-size:10px;font-weight:700;padding:1px 7px;margin-left:5px}
 @media print{.sidebar,.topbar,.no-print{display:none!important}.main{margin-left:0}.content{padding:0}}
+
+/* ==== MOBILE ==== */
+.hamburger-btn{
+  display:none;align-items:center;justify-content:center;
+  width:40px;height:40px;border:none;background:transparent;
+  cursor:pointer;border-radius:9px;color:#374151;flex-shrink:0;
+  -webkit-tap-highlight-color:transparent
+}
+.hamburger-btn:active{background:#f1f5f9}
+.sidebar-overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.45);z-index:199
+}
+.sidebar-overlay.show{display:block}
+.mobile-tabbar{
+  display:none;position:fixed;bottom:0;left:0;right:0;
+  height:60px;background:#fff;border-top:1px solid #e2e8f0;
+  z-index:150;padding-bottom:env(safe-area-inset-bottom,0px)
+}
+.mobile-tab{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:3px;font-size:10px;font-weight:600;
+  color:#94a3b8;border:none;background:transparent;cursor:pointer;
+  position:relative;-webkit-tap-highlight-color:transparent;height:100%
+}
+.mobile-tab.active{color:#1e3a5f}
+.mobile-tab svg{width:22px;height:22px}
+.mobile-tab-badge{
+  position:absolute;top:7px;left:calc(50% + 4px);
+  background:#ef4444;color:#fff;border-radius:10px;
+  font-size:9px;font-weight:700;padding:1px 5px;
+  min-width:16px;text-align:center;display:none;line-height:14px
+}
+.mobile-tab-badge.show{display:block}
+@media(max-width:767px){
+  body{display:block}
+  .sidebar{
+    transform:translateX(-100%);
+    transition:transform .28s cubic-bezier(.4,0,.2,1);
+    z-index:300;width:260px
+  }
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0;padding-bottom:calc(60px + env(safe-area-inset-bottom,0px))}
+  .topbar{padding:10px 14px;gap:8px}
+  .topbar h2{font-size:15px}
+  .content{padding:14px}
+  .stats-grid{grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+  .stat-value{font-size:20px}
+  .charts-grid{grid-template-columns:1fr}
+  .form-row{grid-template-columns:1fr}
+  .fin-grid{grid-template-columns:1fr}
+  .kpi-grid{grid-template-columns:1fr 1fr}
+  .hamburger-btn{display:flex}
+  .mobile-tabbar{display:flex}
+  .table-wrap{-webkit-overflow-scrolling:touch}
+  .modal{width:96%;padding:20px}
+  .card{padding:16px}
+  .action-row{flex-direction:column;align-items:stretch}
+  .action-row .btn{width:100%;justify-content:center}
+  .search-wrap input{width:100%}
+  .search-wrap{width:100%}
+  .tab-bar{width:100%;overflow-x:auto}
+  .denom-tbl input{width:46px;font-size:11px}
+}
 </style>
 </head>
 <body>
@@ -147,6 +211,9 @@ textarea.form-control{resize:vertical;min-height:68px}
 
 <main class="main">
   <div class="topbar">
+    <button class="hamburger-btn" onclick="toggleSidebar()" aria-label="Menú">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
     <h2 id="page-title">Dashboard</h2>
     <div style="font-size:12px;color:#94a3b8" id="topbar-date"></div>
   </div>
@@ -299,6 +366,32 @@ textarea.form-control{resize:vertical;min-height:68px}
 </main>
 
 <div id="toasts"></div>
+
+<div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+<nav class="mobile-tabbar">
+  <button class="mobile-tab active" data-sec="dashboard" onclick="nav('dashboard');closeSidebar()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+    Inicio
+  </button>
+  <button class="mobile-tab" data-sec="pedidos" onclick="nav('pedidos');closeSidebar()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+    <span class="mobile-tab-badge" id="mobile-badge">0</span>
+    Pedidos
+  </button>
+  <button class="mobile-tab" data-sec="clientes" onclick="nav('clientes');closeSidebar()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+    Clientes
+  </button>
+  <button class="mobile-tab" data-sec="inventario" onclick="nav('inventario');closeSidebar()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+    Inventario
+  </button>
+  <button class="mobile-tab" data-sec="config" onclick="nav('config');closeSidebar()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    Config
+  </button>
+</nav>
 
 <!-- MODAL CLIENTE -->
 <div class="modal-overlay" id="m-cliente"><div class="modal">
@@ -556,14 +649,18 @@ document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click
 // ==================== NAV ====================
 let charts={};
 function nav(sec){
+  currentSec=sec;
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('s-'+sec).classList.add('active');
   document.querySelectorAll('.nav-item').forEach(ni=>{if(ni.getAttribute('onclick')===`nav('${sec}')`)ni.classList.add('active');});
+  document.querySelectorAll('.mobile-tab').forEach(t=>t.classList.toggle('active',t.dataset.sec===sec));
   const titles={dashboard:'Dashboard',clientes:'Clientes',puntos:'Puntos de Recolección',recolecciones:'Recolecciones',pedidos:'Pedidos',inventario:'Inventario',finanzas:'Finanzas & Capital',reportes:'Reportes',config:'Configuración'};
   document.getElementById('page-title').textContent=titles[sec]||sec;
   ({dashboard:renderDash,clientes:renderClientes,puntos:renderPuntos,recolecciones:renderRec,pedidos:renderPedidos,inventario:renderInv,finanzas:renderFin,reportes:renderReport,config:renderCFG})[sec]?.();
 }
+function toggleSidebar(){document.querySelector('.sidebar').classList.toggle('open');document.querySelector('.sidebar-overlay').classList.toggle('show');}
+function closeSidebar(){document.querySelector('.sidebar').classList.remove('open');document.querySelector('.sidebar-overlay').classList.remove('show');}
 
 // ==================== SHARE ====================
 function showShare(title,msg){
@@ -585,6 +682,8 @@ function checkPending(){
   const unread=pending.filter(p=>!p.processed);
   const badge=document.getElementById('pending-badge');
   if(badge){badge.textContent=unread.length;badge.classList.toggle('show',unread.length>0);}
+  const mbadge=document.getElementById('mobile-badge');
+  if(mbadge){mbadge.textContent=unread.length;mbadge.classList.toggle('show',unread.length>0);}
   if(unread.length>0&&currentSec==='pedidos')renderPendingBanner();
 }
 function renderPendingBanner(){
